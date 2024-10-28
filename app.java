@@ -1,5 +1,24 @@
 import java.util.*;
 
+// Custom exceptions
+class InvalidDonationAmountException extends Exception {
+    public InvalidDonationAmountException(String message) {
+        super(message);
+    }
+}
+
+class InvalidScholarshipAmountException extends Exception {
+    public InvalidScholarshipAmountException(String message) {
+        super(message);
+    }
+}
+
+class InvalidIdFormatException extends Exception {
+    public InvalidIdFormatException(String message) {
+        super(message);
+    }
+}
+
 // Define Displayable interface
 interface Displayable {
     void displayInfo();
@@ -29,8 +48,14 @@ class Student extends Person {
     private double gpa;
     private double scholarshipAmount;
 
-    public Student(String name, String email, int graduationYear, String studentId, double gpa, double scholarshipAmount) {
+    public Student(String name, String email, int graduationYear, String studentId, double gpa, double scholarshipAmount) throws InvalidScholarshipAmountException, InvalidIdFormatException {
         super(name);
+        if (scholarshipAmount < 0) {
+            throw new InvalidScholarshipAmountException("Scholarship amount cannot be negative.");
+        }
+        if (!studentId.startsWith("IT")) {
+            throw new InvalidIdFormatException("Student ID must start with 'IT'.");
+        }
         this.email = email;
         this.graduationYear = graduationYear;
         this.studentId = studentId;
@@ -54,10 +79,12 @@ class Student extends Person {
 
 class Donor extends Person {
     private double donationAmount;
-    // Removed donationDate for simplicity
 
-    public Donor(String name, double donationAmount) {
+    public Donor(String name, double donationAmount) throws InvalidDonationAmountException {
         super(name);
+        if (donationAmount < 0) {
+            throw new InvalidDonationAmountException("Donation amount cannot be negative.");
+        }
         this.donationAmount = donationAmount;
     }
 
@@ -65,7 +92,6 @@ class Donor extends Person {
     public void displayInfo() {
         super.displayInfo();
         System.out.println("Donation Amount: " + donationAmount);
-        // System.out.println("Donation Date: " + donationDate); // Removed for simplicity
     }
 }
 
@@ -145,45 +171,50 @@ class ScholarshipManager {
     }
 }
 
-class AlumniEventApp {
+class app {
     public static void main(String[] args) {
         AlumniEvent alumniEvent = new AlumniEvent("2024 Alumni Reunion", "Sep 25, 2024", "KK Auditorium", 5);
         ScholarshipManager manager = new ScholarshipManager();
 
-        Student student1 = new Student("Praveen", "praveen@gmail.com", 2020, "S001", 9.8, 1000.00);
-        Student student2 = new Student("Raju", "raju@gmail.com", 2021, "S002", 9.9, 1500.00);
-        Student student3 = new Student("Akthar", "akthar@gmail.com", 2022, "S003", 9.7, 2000.00);
+        try {
+            Student student1 = new Student("Praveen", "praveen@gmail.com", 2020, "IT001", 9.8, 1000.00);
+            Student student2 = new Student("Raju", "raju@gmail.com", 2021, "002", 9.9, -1500.00);
+            Student student3 = new Student("Akthar", "akthar@gmail.com", 2022, "IT003", 9.7, 2000.00);
 
-        alumniEvent.addAttendee(student1);
-        alumniEvent.addAttendee(student2);
-        alumniEvent.addAttendee(student3);
+            alumniEvent.addAttendee(student1);
+            alumniEvent.addAttendee(student2);
+            alumniEvent.addAttendee(student3);
 
-        manager.addStudent(student1);
-        manager.addStudent(student2);
-        manager.addStudent(student3);
-        Donor d1 = new Donor("96 Reblend", 5000);
-        manager.addDonor(d1);
+            manager.addStudent(student1);
+            manager.addStudent(student2);
+            manager.addStudent(student3);
+            
+            Donor d1 = new Donor("96Reblend", -5000);
+            manager.addDonor(d1);
 
-        alumniEvent.displayEventDetails();
+            alumniEvent.displayEventDetails();
 
-        Scanner sc = new Scanner(System.in);
-        System.out.print("Enter student ID to retrieve: ");
-        String id = sc.next();
-        Student retrievedStudent = manager.getStudent(id);
-        if (retrievedStudent != null) {
-            retrievedStudent.displayInfo(); // Polymorphic call
-        } else {
-            System.out.println("Student not found.");
-        }
+            Scanner sc = new Scanner(System.in);
+            System.out.print("Enter student ID to retrieve: ");
+            String id = sc.next();
+            Student retrievedStudent = manager.getStudent(id);
+            if (retrievedStudent != null) {
+                retrievedStudent.displayInfo(); // Polymorphic call
+            } else {
+                System.out.println("Student not found.");
+            }
 
-        // Example of retrieving a donor
-        System.out.print("Enter donor name to retrieve: ");
-        String donorName = sc.next();
-        Donor retrievedDonor = manager.getDonor(donorName);
-        if (retrievedDonor != null) {
-            retrievedDonor.displayInfo(); // Polymorphic call
-        } else {
-            System.out.println("Donor not found.");
+            // Example of retrieving a donor
+            System.out.print("Enter donor name to retrieve: ");
+            String donorName = sc.next();
+            Donor retrievedDonor = manager.getDonor(donorName);
+            if (retrievedDonor != null) {
+                retrievedDonor.displayInfo(); // Polymorphic call
+            } else {
+                System.out.println("Donor not found.");
+            }
+        } catch (InvalidScholarshipAmountException | InvalidDonationAmountException | InvalidIdFormatException e) {
+            System.out.println("Error: " + e.getMessage());
         }
     }
 }
