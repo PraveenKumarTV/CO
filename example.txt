@@ -1,0 +1,11 @@
+SNo,Brand,Processor,RAM,Storage,Cost,MonitorSize,YearOfManufacture,Warranty
+1,Dell,Intel i5,8,512,55000,15,2022,1
+2,HP,AMD Ryzen 5,16,1024,60000,14,2021,2
+3,Lenovo,Intel i7,16,512,75000,15,2023,2
+4,Acer,Intel i3,4,256,35000,14,2020,1
+5,Asus,AMD Ryzen 7,32,1024,95000,17,2023,3
+6,MSI,Intel i5,8,512,65000,15,2022,2
+7,Apple,M1,8,256,95000,13,2021,1
+8,Lenovo,Intel i9,32,1024,120000,15,2023,3
+9,HP,Intel i5,8,512,50000,14,2021,1
+10,Dell,AMD Ryzen 5,16,1024,65000,14,2022,2
