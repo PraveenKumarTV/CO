@@ -36,8 +36,8 @@ public class oops7a {
                 prsr[j] = data[2];
                 ram[j] = data[3];
                 stg[j] = data[4];
-                size[j] = data[5];
-                cost[j] = data[6];
+                size[j] = data[6];
+                cost[j] = data[5];
                 yom[j] = data[7];
                 war[j] = data[8];
 
@@ -91,10 +91,56 @@ public class oops7a {
         System.out.println("Processor and memory details:");
         for(int i=0;i<10;i++){
             int b=Integer.parseInt(cost[i]);
+            //System.out.println(b);
             if(b>price){
-            System.out.println("Processor: "+prsr[i]+" Ram: "+ram[i]+" Storage: "+stg[i]);
+            System.out.println("Processor: "+prsr[i]+", Ram: "+ram[i]+", Storage: "+stg[i]);
             }
         }
+        a=1;
+        for(int i=0;i<10;i++){
+            int b=Integer.parseInt(war[i]);
+            if(b==2||b==3){
+                System.out.println("sno: "+sno[i]);
+                System.out.println("brand: "+brand[i]);
+                System.out.println("processor: "+prsr[i]);
+                System.out.println("RAM: "+ram[i]);
+                System.out.println("storage: "+stg[i]);
+                System.out.println("monitor size: "+size[i]);
+                System.out.println("cost: "+cost[i]);
+                System.out.println("year of manufacture: "+yom[i]);
+                System.out.println("Warranty(in years): "+war[i]);
+                a=0;
+            }
+        }
+        if(a==1){
+            System.out.println("Warranty with 2 or 3 years not found");
+        }
+        a=1;
+        System.out.println("Enter ram: ");
+        int rm=sc.nextInt();
+        System.out.println("Enter monitor size: ");
+        int ms=sc.nextInt();
+        
+        for(int i=0;i<10;i++){
+            int b=Integer.parseInt(ram[i]);
+            int c=Integer.parseInt(size[i]);
+            if(rm<b && ms<c){
+                System.out.println("sno: "+sno[i]);
+                System.out.println("brand: "+brand[i]);
+                System.out.println("processor: "+prsr[i]);
+                System.out.println("RAM: "+ram[i]);
+                System.out.println("storage: "+stg[i]);
+                System.out.println("monitor size: "+size[i]);
+                System.out.println("cost: "+cost[i]);
+                System.out.println("year of manufacture: "+yom[i]);
+                System.out.println("Warranty(in years): "+war[i]);
+                a=0;
+            }
+        }
+        if(a==1){
+            System.out.println("Warranty with 2 or 3 years not found");
+        }
+
 
 
     }
