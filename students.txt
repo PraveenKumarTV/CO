@@ -1,0 +1,5 @@
+IT001,Praveen,praveen@gmail.com,2020,9.8,1000.0
+IT002,Sita,sita@gmail.com,2021,9.5,1500.0
+IT003,Akthar,akthar@gmail.com,2022,9.7,2000.0
+IT004,Shiva,shiva@gmail.com,2023,8.9,500.0
+IT005,Arun,arun@gmail.com,2024,9.0,1200.0
