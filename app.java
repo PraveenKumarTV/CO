@@ -1,3 +1,4 @@
+import java.io.*;
 import java.util.*;
 
 // Custom exceptions
@@ -75,6 +76,10 @@ class Student extends Person {
     public String getStudentId() {
         return studentId;
     }
+
+    public String toFileString() {
+        return studentId + "," + getName() + "," + email + "," + graduationYear + "," + gpa + "," + scholarshipAmount;
+    }
 }
 
 class Donor extends Person {
@@ -93,29 +98,30 @@ class Donor extends Person {
         super.displayInfo();
         System.out.println("Donation Amount: " + donationAmount);
     }
+
+    public String toFileString() {
+        return getName() + "," + donationAmount;
+    }
 }
 
 class AlumniEvent {
     private String eventName;
     private String date;
     private String location;
-    private Student[] attendees;
+    private List<Student> attendees;
     private int maxAttendees;
-    private int currentAttendeeCount;
 
     public AlumniEvent(String eventName, String date, String location, int maxAttendees) {
         this.eventName = eventName;
         this.date = date;
         this.location = location;
         this.maxAttendees = maxAttendees;
-        this.attendees = new Student[maxAttendees];
-        this.currentAttendeeCount = 0;
+        this.attendees = new ArrayList<>();
     }
 
     public boolean addAttendee(Student student) {
-        if (currentAttendeeCount < maxAttendees) {
-            attendees[currentAttendeeCount] = student;
-            currentAttendeeCount++;
+        if (attendees.size() < maxAttendees) {
+            attendees.add(student);
             return true;
         }
         return false; // Event is full
@@ -126,73 +132,126 @@ class AlumniEvent {
         System.out.println("Date: " + date);
         System.out.println("Location: " + location);
         System.out.println("Attendees:");
-        for (int i = 0; i < currentAttendeeCount; i++) {
-            attendees[i].displayInfo(); // Polymorphic call
+        for (Student student : attendees) {
+            student.displayInfo(); // Polymorphic call
         }
     }
 }
 
 class ScholarshipManager {
-    private Student[] students = new Student[100]; // Maximum of 100 students
-    private Donor[] donors = new Donor[100]; // Maximum of 100 donors
-    private int studentCount = 0;
-    private int donorCount = 0;
+    private List<Student> students = new ArrayList<>();
+    private List<Donor> donors = new ArrayList<>();
 
     public void addStudent(Student s) {
-        if (studentCount < students.length) {
-            students[studentCount] = s;
-            studentCount++;
-        }
+        students.add(s);
     }
 
     public void addDonor(Donor d) {
-        if (donorCount < donors.length) {
-            donors[donorCount] = d;
-            donorCount++;
-        }
+        donors.add(d);
     }
 
     public Student getStudent(String id) {
-        for (int i = 0; i < studentCount; i++) {
-            if (students[i].getStudentId().equals(id)) {
-                return students[i];
+        for (Student student : students) {
+            if (student.getStudentId().equals(id)) {
+                return student;
             }
         }
         return null;
     }
 
     public Donor getDonor(String name) {
-        for (int i = 0; i < donorCount; i++) {
-            if (donors[i].getName().equals(name)) {
-                return donors[i];
+        for (Donor donor : donors) {
+            if (donor.getName().equals(name)) {
+                return donor;
             }
         }
         return null;
     }
+
+    public void writeStudentsToFile(String filename) throws IOException {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename))) {
+            for (Student student : students) {
+                writer.write(student.toFileString());
+                writer.newLine();
+            }
+        }
+    }
+
+    public void writeDonorsToFile(String filename) throws IOException {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(filename))) {
+            for (Donor donor : donors) {
+                writer.write(donor.toFileString());
+                writer.newLine();
+            }
+        }
+    }
+
+    public void readStudentsFromFile(String filename) throws IOException {
+        try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] data = line.split(",");
+                String studentId = data[0];
+                String name = data[1];
+                String email = data[2];
+                int graduationYear = Integer.parseInt(data[3]);
+                double gpa = Double.parseDouble(data[4]);
+                double scholarshipAmount = Double.parseDouble(data[5]);
+                try {
+                    Student student = new Student(name, email, graduationYear, studentId, gpa, scholarshipAmount);
+                    addStudent(student);
+                } catch (InvalidScholarshipAmountException | InvalidIdFormatException e) {
+                    System.out.println("Error processing student: " + e.getMessage());
+                }
+            }
+        }
+    }
+
+    public void readDonorsFromFile(String filename) throws IOException {
+        try (BufferedReader reader = new BufferedReader(new FileReader(filename))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] data = line.split(",");
+                String name = data[0];
+                double donationAmount = Double.parseDouble(data[1]);
+                try {
+                    Donor donor = new Donor(name, donationAmount);
+                    addDonor(donor);
+                } catch (InvalidDonationAmountException e) {
+                    System.out.println("Error processing donor: " + e.getMessage());
+                }
+            }
+        }
+    }
 }
 
-class app {
+public class App {
     public static void main(String[] args) {
         AlumniEvent alumniEvent = new AlumniEvent("2024 Alumni Reunion", "Sep 25, 2024", "KK Auditorium", 5);
         ScholarshipManager manager = new ScholarshipManager();
 
         try {
-            Student student1 = new Student("Praveen", "praveen@gmail.com", 2020, "IT001", 9.8, 1000.00);
-            Student student2 = new Student("Raju", "raju@gmail.com", 2021, "002", 9.9, -1500.00);
-            Student student3 = new Student("Akthar", "akthar@gmail.com", 2022, "IT003", 9.7, 2000.00);
+            // Reading students and donors from file
+            manager.readStudentsFromFile("students.txt");
+            manager.readDonorsFromFile("donors.txt");
 
+            // Adding students to the event and manager
+            Student student1 = new Student("Praveen", "praveen@gmail.com", 2020, "IT001", 9.8, 1000.00);
+            Student student2 = new Student("Raju", "raju@gmail.com", 2021, "IT002", 9.9, 1500.00);  // Will throw error
+            Student student3 = new Student("Akthar", "akthar@gmail.com", 2022, "IT003", 9.7, 2000.00);
             alumniEvent.addAttendee(student1);
-            alumniEvent.addAttendee(student2);
             alumniEvent.addAttendee(student3);
 
-            manager.addStudent(student1);
-            manager.addStudent(student2);
-            manager.addStudent(student3);
-            
-            Donor d1 = new Donor("96Reblend", -5000);
-            manager.addDonor(d1);
+            // Adding donors
+            Donor donor1 = new Donor("96Reblend", 5000);
+            manager.addDonor(donor1);
 
+            // Displaying event details
             alumniEvent.displayEventDetails();
+
+            // Write students and donors to files after processing
+            manager.writeStudentsToFile("students.txt");
+            manager.writeDonorsToFile("donors.txt");
 
             Scanner sc = new Scanner(System.in);
             System.out.print("Enter student ID to retrieve: ");
@@ -204,7 +263,6 @@ class app {
                 System.out.println("Student not found.");
             }
 
-            // Example of retrieving a donor
             System.out.print("Enter donor name to retrieve: ");
             String donorName = sc.next();
             Donor retrievedDonor = manager.getDonor(donorName);
@@ -213,7 +271,7 @@ class app {
             } else {
                 System.out.println("Donor not found.");
             }
-        } catch (InvalidScholarshipAmountException | InvalidDonationAmountException | InvalidIdFormatException e) {
+        } catch (IOException | InvalidScholarshipAmountException | InvalidDonationAmountException | InvalidIdFormatException e) {
             System.out.println("Error: " + e.getMessage());
         }
     }
